@@ -23,14 +23,16 @@ namespace Match3
 
 		// "Renderers"
 
-		void PrintHint();
+		void PrintHints();
 		void PrintBoard(const char* title);
 
 	private:
 		Board board;
-		Move hint;
+		Moves hints;
 
 		Indexes matches;
 		Indexes affected;
+
+		Config config;
 	};
 }

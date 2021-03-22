@@ -29,6 +29,7 @@ namespace
 	}
 
 	constexpr int kMinMatches = 3;
+	constexpr int kShuffleAttempts = 100;
 }
 
 Board::Board(int width, int height, bool generate)
@@ -73,7 +74,7 @@ void Board::Shuffle()
 {
 	Generate();
 
-	int attempts = 100;
+	int attempts = kShuffleAttempts;
 	while (!HasMoves() && attempts--)
 		Generate();
 	assertm(attempts, "An infinite loop while the board generation");
@@ -230,9 +231,9 @@ Indexes Board::Scroll(const Indexes& cleared)
 	return affected;
 }
 
-bool Board::GetHint(Move* move)
+bool Board::GetHints(Moves* hints)
 {
-	// TODO: нужен комментарий почему брутфорс
+	// TODO: Explain the brute-force
 
 	for (const auto& cell : cells)
 	{
@@ -255,14 +256,15 @@ bool Board::GetHint(Move* move)
 
 				if (HasMatches(cell.index) || HasMatches(index))
 				{
-					if (move)
+					if (hints)
 					{
-						move->first = cell.index;
-						move->second = index;
+						hints->insert({ cell.index, index });
 					}
-
-					SwapContents(index, cell.index);
-					return true;
+					else
+					{
+						SwapContents(index, cell.index);
+						return true;
+					}
 				}
 
 				SwapContents(index, cell.index);
@@ -283,14 +285,24 @@ string Board::ToString()
 	string result;
 	int carriage = 0;
 
+	result += "   ";
+
+	for (int i = 0; i < width; ++i)
+		result += " " + to_string(i) + " ";
+
+	result += "\n 0 ";
+	int i = 0;
+
 	for (const auto& cell : cells)
 	{
-		result += to_string(static_cast<int>(cell.contents)) + ", ";
+		int content = static_cast<int>(cell.contents);
+		result += u8"\033[" + to_string(content + 40) + "m " + to_string(content) + " \033[49m";
 
 		if (++carriage == width)
 		{
 			carriage = 0;
-			result += "\n";
+			if (++i < height)
+				result += "\n " + to_string(i) + " ";
 		}
 	}
 

@@ -10,17 +10,18 @@ namespace Match3
 {
 	using Indexes = std::set<int>;
 	using Move = std::pair<int, int>;
+	using Moves = std::set<Move>;
 
 	enum class EContentsType
 	{
 		Empty,
 
 		// Gems
+		GemRed,
+		GemGreen,
 		GemYellow,
 		GemBlue,
-		GemGreen,
 		GemPurple,
-		GemRed,
 
 		GemsCount
 	};
@@ -62,8 +63,8 @@ namespace Match3
 		void FillBlanks(const Indexes& affected);
 		Indexes Scroll(const Indexes& cleared);
 
-		bool GetHint(Move* move);
-		bool HasMoves() { return GetHint(nullptr); }
+		bool GetHints(Moves* hits);
+		bool HasMoves() { return GetHints(nullptr); }
 
 		void SwapContents(int lhs, int rhs);
 

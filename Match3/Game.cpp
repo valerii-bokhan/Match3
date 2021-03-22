@@ -8,12 +8,23 @@ using namespace Match3;
 
 namespace
 {
-	inline void print_matches(const char* title, const Indexes& matches)
+	inline void print_matches(const char* title, const Indexes& matches, int width)
 	{
 		cout << title << ": ";
 
 		for (auto& index : matches)
-			cout << index << " ";
+			cout << "[" << index % width << ", " << index / width << "] ";
+
+		cout << "\n\n";
+	}
+
+	inline void print_moves(const char* title, const Moves& moves, int width)
+	{
+		cout << title << ":\n";
+
+		for (const auto& [idx1, idx2] : moves)
+			cout << "\t[[" << idx1 % width << ", " << idx1 / width << "], "
+			<< "[" << idx2 % width << ", " << idx2 / width << "]]\n";
 
 		cout << "\n\n";
 	}
@@ -21,6 +32,7 @@ namespace
 
 Game::Game(const Config& config)
 	: board(Board(config.width, config.height, true))
+	, config(config)
 {}
 
 bool Game::MakeMove(int idx1, int idx2)
@@ -41,7 +53,7 @@ bool Game::MakeMove(int idx1, int idx2)
 		return false;
 	}
 
-	print_matches("Matches", matches);
+	print_matches("Matches", matches, config.width);
 
 	return true;
 }
@@ -60,7 +72,7 @@ void Game::ProcessMove()
 
 	while (matches.size())
 	{
-		print_matches("EXTRA Matches", matches);
+		print_matches("EXTRA Matches", matches, config.width);
 
 		UpdateBoard();
 
@@ -88,7 +100,7 @@ void Game::UpdateBoard()
 
 	affected = board.Scroll(matches);
 
-	print_matches("Affected", affected);
+	print_matches("Affected", affected, config.width);
 
 	PrintBoard("Board (Scroll)");
 
@@ -97,11 +109,11 @@ void Game::UpdateBoard()
 	PrintBoard("Board (Fill Blanks)");
 }
 
-void Game::PrintHint()
+void Game::PrintHints()
 {
-	board.GetHint(&hint);
+	board.GetHints(&hints);
 
-	cout << "Hint: " << hint.first << " " << hint.second << "\n\n";
+	print_moves("Hints", hints, config.width);
 }
 
 void Game::PrintBoard(const char* title)
