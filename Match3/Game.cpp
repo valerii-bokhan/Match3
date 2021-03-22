@@ -142,6 +142,8 @@ void Game::UpdateBoard()
 
 void Game::PrintHints()
 {
+	hints.clear();
+
 	board.GetHints(&hints);
 
 	print_moves("Hints", hints, config.width);

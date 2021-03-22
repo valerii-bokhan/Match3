@@ -3,6 +3,7 @@
 #include <random>
 #include <string>
 #include <set>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -56,10 +57,20 @@ namespace Match3
 		}
 
 	public:
-		constexpr bool operator<(const Move& rhs) const
+		constexpr bool operator==(const Move& rhs) const
 		{
-			return idxs[0] < rhs.idxs[0] && idxs[1] < rhs.idxs[1];
+			return idxs[0] == rhs.idxs[0] && idxs[1] == rhs.idxs[1];
 		}
+
+		struct HashFunction
+		{
+			size_t operator()(const Move& move) const
+			{
+				size_t xHash = std::hash<int>()(move.GetFirstIndex());
+				size_t yHash = std::hash<int>()(move.GetSecondIndex()) << 1;
+				return xHash ^ yHash;
+			}
+		};
 
 		constexpr int GetFirstIndex() const { return idxs[0]; }
 		constexpr int GetSecondIndex() const { return idxs[1]; }
@@ -69,7 +80,7 @@ namespace Match3
 	};
 
 	using Indexes = std::set<int>;
-	using Moves = std::set<Move>;
+	using Moves = std::unordered_set<Move, Move::HashFunction>;
 
 	class Board final
 	{
