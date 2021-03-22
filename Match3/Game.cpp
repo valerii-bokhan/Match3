@@ -16,7 +16,7 @@ namespace
 
 		for (auto& index : matches)
 		{
-			cout << "[" << index % width << ", " << index / width << "], ";
+			cout << "[" << index % width << ", " << index / width << "] ";
 
 			if (++carriage == 6)
 			{
@@ -51,6 +51,11 @@ namespace
 
 		cout << "\n\n";
 	}
+
+	inline void print_wrong_move(int idx1, int idx2)
+	{
+		cout << "Wrong move: " << idx1 << " " << idx2 << "\n\n";
+	}
 }
 
 Game::Game(const Config& config)
@@ -62,17 +67,20 @@ bool Game::MakeMove(int idx1, int idx2)
 {
 	matches.clear();
 
-	board.SwapContents(idx1, idx2);
+	if (!board.SwapContents(idx1, idx2))
+	{
+		print_wrong_move(idx1, idx2);
+		return false;
+	}
 
 	board.GetMatches(idx1, &matches);
 	board.GetMatches(idx2, &matches);
 
 	if (!matches.size())
 	{
-		cout << "Wrong move: " << idx1 << " " << idx2 << "\n\n";
-
 		board.SwapContents(idx1, idx2);
 
+		print_wrong_move(idx1, idx2);
 		return false;
 	}
 

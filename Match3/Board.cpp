@@ -93,27 +93,36 @@ void Board::Generate()
 	}
 }
 
-void Board::SwapContents(int lhs, int rhs)
+bool Board::SwapContents(int lhs, int rhs)
 {
 	assert(is_valid(lhs, capacity));
 	if (!is_valid(lhs, capacity))
-		return;
+		return false;
 
 	assert(is_valid(rhs, capacity));
 	if (!is_valid(rhs, capacity))
-		return;
+		return false;
 
 	assert(lhs != rhs);
 	if (lhs == rhs)
-		return;
+		return false;
 
 	Cell& a = cells[lhs];
 	Cell& b = cells[rhs];
 
-	if (a.contents == b.contents)
-		return;
+	// Check if cells are neighbors
+	if ((a.x == b.x && abs(a.y - b.y) == 1) ||
+		(a.y == b.y && abs(a.x - b.x) == 1))
+	{
+		if (a.contents == b.contents)
+			return false;
 
-	a.contents = exchange(b.contents, a.contents);
+		a.contents = exchange(b.contents, a.contents);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool Board::GetMatches(int index, Indexes* matches) const
@@ -252,7 +261,8 @@ bool Board::GetHints(Moves* hints)
 				if (cell.contents == cells[index].contents)
 					continue;
 
-				SwapContents(index, cell.index);
+				if (!SwapContents(index, cell.index))
+					continue;
 
 				if (HasMatches(cell.index) || HasMatches(index))
 				{

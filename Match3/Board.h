@@ -90,7 +90,7 @@ namespace Match3
 		bool GetHints(Moves* hits);
 		bool HasMoves() { return GetHints(nullptr); }
 
-		void SwapContents(int lhs, int rhs);
+		bool SwapContents(int lhs, int rhs);
 
 		std::string ToString();
 
