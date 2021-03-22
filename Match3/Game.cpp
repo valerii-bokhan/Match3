@@ -10,10 +10,20 @@ namespace
 {
 	inline void print_matches(const char* title, const Indexes& matches, int width)
 	{
-		cout << title << ": ";
+		cout << title << ":\n\t";
+
+		int carriage = 0;
 
 		for (auto& index : matches)
-			cout << "[" << index % width << ", " << index / width << "] ";
+		{
+			cout << "[" << index % width << ", " << index / width << "], ";
+
+			if (++carriage == 6)
+			{
+				carriage = 0;
+				cout << "\n\t";
+			}
+		}
 
 		cout << "\n\n";
 	}
@@ -22,9 +32,22 @@ namespace
 	{
 		cout << title << ":\n";
 
-		for (const auto& [idx1, idx2] : moves)
-			cout << "\t[[" << idx1 % width << ", " << idx1 / width << "], "
-			<< "[" << idx2 % width << ", " << idx2 / width << "]]\n";
+		int carriage = 0;
+
+		for (const auto& move : moves)
+		{
+			const int idx1 = move.GetFirstIndex();
+			const int idx2 = move.GetSecondIndex();
+
+			cout << "\t[" << idx1 % width << ", " << idx1 / width << "], "
+				<< "[" << idx2 % width << ", " << idx2 / width << "], ";
+
+			if (++carriage == 3)
+			{
+				carriage = 0;
+				cout << "\n";
+			}
+		}
 
 		cout << "\n\n";
 	}

@@ -283,7 +283,8 @@ const EContentsType Board::GetRandomContents()
 string Board::ToString()
 {
 	string result;
-	int carriage = 0;
+	int carriagew = 0;
+	int carriageh = 0;
 
 	result += "   ";
 
@@ -291,18 +292,17 @@ string Board::ToString()
 		result += " " + to_string(i) + " ";
 
 	result += "\n 0 ";
-	int i = 0;
 
 	for (const auto& cell : cells)
 	{
 		int content = static_cast<int>(cell.contents);
 		result += u8"\033[" + to_string(content + 40) + "m " + to_string(content) + " \033[49m";
 
-		if (++carriage == width)
+		if (++carriagew == width)
 		{
-			carriage = 0;
-			if (++i < height)
-				result += "\n " + to_string(i) + " ";
+			carriagew = 0;
+			if (++carriageh < height)
+				result += "\n " + to_string(carriageh) + " ";
 		}
 	}
 

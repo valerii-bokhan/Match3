@@ -8,10 +8,6 @@
 
 namespace Match3
 {
-	using Indexes = std::set<int>;
-	using Move = std::pair<int, int>;
-	using Moves = std::set<Move>;
-
 	enum class EContentsType
 	{
 		Empty,
@@ -46,6 +42,34 @@ namespace Match3
 			return contents == EContentsType::Empty;
 		}
 	};
+
+	class Move
+	{
+	public:
+		Move(int idx1, int idx2)
+		{
+			idxs[0] = idx1;
+			idxs[1] = idx2;
+
+			if (idx1 > idx2)
+				std::swap(idxs[0], idxs[1]);
+		}
+
+	public:
+		constexpr bool operator<(const Move& rhs) const
+		{
+			return idxs[0] < rhs.idxs[0] && idxs[1] < rhs.idxs[1];
+		}
+
+		constexpr int GetFirstIndex() const { return idxs[0]; }
+		constexpr int GetSecondIndex() const { return idxs[1]; }
+
+	private:
+		int idxs[2];
+	};
+
+	using Indexes = std::set<int>;
+	using Moves = std::set<Move>;
 
 	class Board final
 	{
