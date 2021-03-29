@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Board.h"
+#include <Model/Board.h>
 
 namespace Match3
 {
@@ -13,7 +13,7 @@ namespace Match3
 	class Game final
 	{
 	public:
-		Game(const Config& config);
+		explicit Game(const Config& config);
 
 	public:
 		bool MakeMove(int idx1, int idx2);

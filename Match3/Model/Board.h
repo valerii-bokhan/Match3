@@ -121,7 +121,7 @@ namespace Match3
 		std::random_device device;
 		std::mt19937 generator{ device() };
 		std::uniform_int_distribution<int> distribution{
-			1, // EContentsType::GemYellow
+			1, // EContentsType::GemRed
 			static_cast<int>(EContentsType::GemsCount) - 1
 		};
 	};

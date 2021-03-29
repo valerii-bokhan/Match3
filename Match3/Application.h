@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Game.h"
+#include <Controller/Game.h>
 
 namespace Match3
 {
