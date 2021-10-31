@@ -8,60 +8,40 @@ using namespace Match3;
 
 namespace
 {
-	inline void print_matches(const char* title, const Indexes& matches, int width)
+	inline constexpr int make_index(int x, int y, int width)
 	{
-		cout << title << ":\n\t";
-
-		int carriage = 0;
-
-		for (auto& index : matches)
-		{
-			cout << "[" << index % width << ", " << index / width << "] ";
-
-			if (++carriage == 6)
-			{
-				carriage = 0;
-				cout << "\n\t";
-			}
-		}
-
-		cout << "\n\n";
-	}
-
-	inline void print_moves(const char* title, const Moves& moves, int width)
-	{
-		cout << title << ":\n";
-
-		int carriage = 0;
-
-		for (const auto& move : moves)
-		{
-			const int idx1 = move.GetFirstIndex();
-			const int idx2 = move.GetSecondIndex();
-
-			cout << "\t[" << idx1 % width << ", " << idx1 / width << "], "
-				<< "[" << idx2 % width << ", " << idx2 / width << "], ";
-
-			if (++carriage == 3)
-			{
-				carriage = 0;
-				cout << "\n";
-			}
-		}
-
-		cout << "\n\n";
-	}
-
-	inline void print_wrong_move(int idx1, int idx2)
-	{
-		cout << "Wrong move: " << idx1 << " " << idx2 << "\n\n";
+		return y * width + x;
 	}
 }
 
 Game::Game(const Config& config)
-	: board(Board(config.width, config.height, true))
-	, config(config)
+	: config(config)
+	, board(Board(config.width, config.height, true))
+	, renderer(Renderer(board))
 {}
+
+void Game::Run()
+{
+	renderer.RenderBoard("Board");
+	renderer.RenderHints();
+
+	while (true)
+	{
+		int x1, x2, y1, y2;
+		cin >> x1 >> y1 >> x2 >> y2;
+		cout << "\n";
+
+		const int idx1 = make_index(x1, y1, config.width);
+		const int idx2 = make_index(x2, y2, config.width);
+
+		if (!MakeMove(idx1, idx2))
+			continue;
+
+		ProcessMove();
+
+		renderer.RenderHints();
+	}
+}
 
 bool Game::MakeMove(int idx1, int idx2)
 {
@@ -69,7 +49,7 @@ bool Game::MakeMove(int idx1, int idx2)
 
 	if (!board.SwapContents(idx1, idx2))
 	{
-		print_wrong_move(idx1, idx2);
+		renderer.RenderWrongMove(idx1, idx2);
 		return false;
 	}
 
@@ -80,11 +60,11 @@ bool Game::MakeMove(int idx1, int idx2)
 	{
 		board.SwapContents(idx1, idx2);
 
-		print_wrong_move(idx1, idx2);
+		renderer.RenderWrongMove(idx1, idx2);
 		return false;
 	}
 
-	print_matches("Matches", matches, config.width);
+	renderer.RenderMatches("Matches", matches);
 
 	return true;
 }
@@ -103,7 +83,7 @@ void Game::ProcessMove()
 
 	while (matches.size())
 	{
-		print_matches("EXTRA Matches", matches, config.width);
+		renderer.RenderMatches("EXTRA Matches", matches);
 
 		UpdateBoard();
 
@@ -127,29 +107,15 @@ void Game::UpdateBoard()
 
 	board.ClearMatches(matches);
 
-	PrintBoard("Board (Clear Matches)");
+	renderer.RenderBoard("Board (Clear Matches)");
 
 	affected = board.Scroll(matches);
 
-	print_matches("Affected", affected, config.width);
+	renderer.RenderMatches("Affected", affected);
 
-	PrintBoard("Board (Scroll)");
+	renderer.RenderBoard("Board (Scroll)");
 
 	board.FillBlanks(affected);
 
-	PrintBoard("Board (Fill Blanks)");
-}
-
-void Game::PrintHints()
-{
-	hints.clear();
-
-	board.GetHints(&hints);
-
-	print_moves("Hints", hints, config.width);
-}
-
-void Game::PrintBoard(const char* title)
-{
-	cout << title << ":\n\n" << board.ToString() << "\n\n";
+	renderer.RenderBoard("Board (Fill Blanks)");
 }

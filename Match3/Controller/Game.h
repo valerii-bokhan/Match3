@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <Model/Board.h>
+#include <View/Renderer.h>
 
 namespace Match3
 {
@@ -16,23 +17,20 @@ namespace Match3
 		explicit Game(const Config& config);
 
 	public:
+		void Run();
+
 		bool MakeMove(int idx1, int idx2);
 
 		void ProcessMove();
 		void UpdateBoard();
 
-		// "Renderers"
-
-		void PrintHints();
-		void PrintBoard(const char* title);
-
 	private:
+		Config config;
+
 		Board board;
-		Moves hints;
+		Renderer renderer;
 
 		Indexes matches;
 		Indexes affected;
-
-		Config config;
 	};
 }

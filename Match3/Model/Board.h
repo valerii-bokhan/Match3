@@ -81,10 +81,12 @@ namespace Match3
 
 	using Indexes = std::set<int>;
 	using Moves = std::unordered_set<Move, Move::HashFunction>;
+	using Cells = std::vector<Cell>;
 
 	class Board final
 	{
 	public:
+		Board() = delete;
 		Board(int width, int height, bool generate);
 		Board(int width, int height, const std::vector<int>& contents);
 
@@ -98,12 +100,15 @@ namespace Match3
 		void FillBlanks(const Indexes& affected);
 		Indexes Scroll(const Indexes& cleared);
 
-		bool GetHints(Moves* hits);
+		bool GetHints(Moves* hints);
 		bool HasMoves() { return GetHints(nullptr); }
 
 		bool SwapContents(int lhs, int rhs);
 
-		std::string ToString();
+		const Cells& GetCells() const { return cells; }
+
+		int GetWidth() const { return width; }
+		int GetHeight() const { return height; }
 
 	private:
 		void Clear();
@@ -116,7 +121,7 @@ namespace Match3
 		int width = 0;
 		int height = 0;
 
-		std::vector<Cell> cells;
+		Cells cells;
 
 		std::random_device device;
 		std::mt19937 generator{ device() };

@@ -34,8 +34,8 @@ namespace
 
 Board::Board(int width, int height, bool generate)
 	: capacity(width* height)
-	, height(height)
 	, width(width)
+	, height(height)
 {
 	assert(width > 2 && height > 2);
 
@@ -288,33 +288,4 @@ bool Board::GetHints(Moves* hints)
 const EContentsType Board::GetRandomContents()
 {
 	return static_cast<EContentsType>(distribution(generator));
-}
-
-string Board::ToString()
-{
-	string result;
-	int carriagew = 0;
-	int carriageh = 0;
-
-	result += "   ";
-
-	for (int i = 0; i < width; ++i)
-		result += " " + to_string(i) + " ";
-
-	result += "\n 0 ";
-
-	for (const auto& cell : cells)
-	{
-		int content = static_cast<int>(cell.contents);
-		result += u8"\033[" + to_string(content + 40) + "m " + to_string(content) + " \033[49m";
-
-		if (++carriagew == width)
-		{
-			carriagew = 0;
-			if (++carriageh < height)
-				result += "\n " + to_string(carriageh) + " ";
-		}
-	}
-
-	return result;
 }
