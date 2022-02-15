@@ -93,7 +93,7 @@ void Board::Generate()
 	}
 }
 
-bool Board::SwapContents(int lhs, int rhs)
+bool Board::CanSwapContents(int lhs, int rhs) const
 {
 	assert(is_valid(lhs, capacity));
 	if (!is_valid(lhs, capacity))
@@ -107,15 +107,25 @@ bool Board::SwapContents(int lhs, int rhs)
 	if (lhs == rhs)
 		return false;
 
-	Cell& a = cells[lhs];
-	Cell& b = cells[rhs];
+	const Cell& a = cells[lhs];
+	const Cell& b = cells[rhs];
 
 	// Check if cells are neighbors
 	if ((a.x == b.x && abs(a.y - b.y) == 1) ||
 		(a.y == b.y && abs(a.x - b.x) == 1))
 	{
-		if (a.contents == b.contents)
-			return false;
+		return !(a.contents == b.contents);
+	}
+
+	return false;
+}
+
+bool Board::SwapContents(int lhs, int rhs)
+{
+	if (CanSwapContents(lhs, rhs))
+	{
+		Cell& a = cells[lhs];
+		Cell& b = cells[rhs];
 
 		a.contents = exchange(b.contents, a.contents);
 
@@ -127,10 +137,23 @@ bool Board::SwapContents(int lhs, int rhs)
 
 bool Board::GetMatches(int index, Indexes* matches) const
 {
-	assert(is_valid(index, capacity));
-	assert(!cells[index].IsEmpty());
+	return GetMatches(index, -1, matches);
+}
 
-	const Cell& cell = cells[index];
+bool Board::GetMatches(int lhs, int rhs, Indexes* matches) const
+{
+	assert(is_valid(lhs, capacity));
+	assert(!cells[lhs].IsEmpty());
+
+	const Cell& cell = cells[lhs];
+	EContentsType contents = cell.contents;
+
+	if (is_valid(rhs, capacity))
+	{
+		assert(!cells[rhs].IsEmpty());
+		contents = cells[rhs].contents;
+	}
+
 	bool result = false;
 
 	Indexes ties;
@@ -148,7 +171,7 @@ bool Board::GetMatches(int index, Indexes* matches) const
 				continue;
 
 			int idx = make_index(x, y, width);
-			while (cell.contents == cells[idx].contents)
+			while (contents == (idx == rhs ? cell.contents : cells[idx].contents))
 			{
 				ties.insert(idx);
 				tie++; r++;
@@ -183,6 +206,16 @@ bool Board::GetMatches(int index, Indexes* matches) const
 	}
 
 	return false;
+}
+
+bool Board::HasMatches(int index) const
+{
+	return GetMatches(index, nullptr);
+}
+
+bool Board::HasMatches(int lhs, int rhs) const
+{
+	return GetMatches(lhs, rhs, nullptr) || GetMatches(rhs, lhs, nullptr);
 }
 
 void Board::ClearMatches(const Indexes& matches)
@@ -240,7 +273,7 @@ Indexes Board::Scroll(const Indexes& cleared)
 	return affected;
 }
 
-bool Board::GetHints(Moves* hints)
+bool Board::GetHints(Moves* hints) const
 {
 	// TODO: Explain the brute-force
 
@@ -261,10 +294,10 @@ bool Board::GetHints(Moves* hints)
 				if (cell.contents == cells[index].contents)
 					continue;
 
-				if (!SwapContents(index, cell.index))
+				if (!CanSwapContents(cell.index, index))
 					continue;
 
-				if (HasMatches(cell.index) || HasMatches(index))
+				if (HasMatches(cell.index, index))
 				{
 					if (hints)
 					{
@@ -272,17 +305,19 @@ bool Board::GetHints(Moves* hints)
 					}
 					else
 					{
-						SwapContents(index, cell.index);
 						return true;
 					}
 				}
-
-				SwapContents(index, cell.index);
 			}
 		}
 	}
 
 	return false;
+}
+
+bool Board::HasMoves() const
+{
+	return GetHints(nullptr);
 }
 
 const EContentsType Board::GetRandomContents()

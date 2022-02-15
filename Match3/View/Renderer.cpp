@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Match3;
 
-Renderer::Renderer(Board& board)
+Renderer::Renderer(const Board& board)
 	: board(board)
 	, width(board.GetWidth())
 	, height(board.GetHeight())

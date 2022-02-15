@@ -94,15 +94,19 @@ namespace Match3
 		void Shuffle();
 
 		bool GetMatches(int index, Indexes* matches) const;
-		bool HasMatches(int index) const { return GetMatches(index, nullptr); };
+
+		bool HasMatches(int index) const;
+		bool HasMatches(int lhs, int rhs) const;
+
 		void ClearMatches(const Indexes& matches);
 
 		void FillBlanks(const Indexes& affected);
 		Indexes Scroll(const Indexes& cleared);
 
-		bool GetHints(Moves* hints);
-		bool HasMoves() { return GetHints(nullptr); }
+		bool GetHints(Moves* hints) const;
+		bool HasMoves() const;
 
+		bool CanSwapContents(int lhs, int rhs) const;
 		bool SwapContents(int lhs, int rhs);
 
 		const Cells& GetCells() const { return cells; }
@@ -111,6 +115,8 @@ namespace Match3
 		int GetHeight() const { return height; }
 
 	private:
+		bool GetMatches(int lhs, int rhs, Indexes* matches) const;
+
 		void Clear();
 		void Generate();
 

@@ -9,7 +9,7 @@ namespace Match3
 	public:
 		Renderer() = delete;
 		// TODO: make const reference!!!
-		explicit Renderer(Board& board);
+		explicit Renderer(const Board& board);
 
 		void RenderHints();
 		void RenderBoard(const char* title) const;
@@ -20,7 +20,7 @@ namespace Match3
 		static void RenderWrongMove(int idx1, int idx2);
 
 	private:
-		Board& board;
+		const Board& board;
 
 		Moves hints;
 
